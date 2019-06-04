@@ -6,4 +6,4 @@ This repo contains methods which allow to create embeddings based on polish corp
 
 Up to now:
 > - gensim
-> - tensorflow plain model
+> - tensorflow plain model - IN PROGRESS
