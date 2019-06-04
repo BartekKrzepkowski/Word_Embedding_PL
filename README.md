@@ -1,4 +1,4 @@
-# Word_Embedding_PL
+# Word Embedding PL
 This repo contains methods which allow to create embeddings based on polish corpora:
 > - OpenSubtitles 2018 pl
 > - ParaCrawl
