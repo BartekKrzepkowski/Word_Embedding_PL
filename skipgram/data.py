@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 import torch
 from torch.utils.data import Dataset
@@ -31,14 +32,18 @@ class Train_Dataset(Dataset):
         mapping = []
         corpus_words = ['<Start>'] + ['<End>'] + []
         num_corpus_words = 2
-        with open(path, 'r') as f:
-            tokenized_line = f.read().split()
+        df = pd.read_csv(path)
+        lines = df.values
+        for line in lines:
+            tokenized_line = line[0].strip().split()
             for word in tokenized_line:
                 if word not in corpus_words:
                     corpus_words.append(word)
                     num_corpus_words += 1
-            Ind2word = dict(enumerate(corpus_words))
-            word2Ind = {word: i for i, word in Ind2word.items()}
+        Ind2word = dict(enumerate(corpus_words))
+        word2Ind = {word: i for i, word in Ind2word.items()}
+        for line in lines:
+            tokenized_line = line[0].strip().split()
             tokenized_line = ['<Start>'] + tokenized_line + ['<End>']
             for i, c_word in enumerate(tokenized_line):
                 other_words = tokenized_line[max(i - window_size, 0): i] + tokenized_line[i + 1: i + 1 + window_size]
