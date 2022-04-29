@@ -15,7 +15,7 @@ class LMLoss(nn.Module):
         # from given cord I choose index (given axis) wrt value in it
         loss = torch.gather(y_log_prob, index=y_true.unsqueeze(-1), axis=-1).squeeze(-1)
         entropy_cond = - (F.softmax(y_pred, dim=-1) * y_log_prob).sum(axis=-1)
-        eps = entropy_cond.clone() + loss.clone()
+        eps = entropy_cond.detach().clone() + loss.detach().clone()
         loss = - (loss * mask).sum(axis=0)
         return loss.mean(), eps
 

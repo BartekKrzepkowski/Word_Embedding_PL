@@ -17,37 +17,33 @@ class LM_Dataset(Dataset):
     target_vocab_max_size : max target vocab size
     '''
 
-    def __init__(self, path, pad_token='<pad>'):
+    def __init__(self, path, pad_token='<pad>', min_sent_lenght=4, max_sent_lenght=20):
 
         self.Ind2word = None
         self.pad_token = pad_token
         self.indexed_data = []
-        self.create_mapping(path)
+        self.create_mapping(path, min_sent_lenght, max_sent_lenght)
         self.indices = np.arange(len(self.Ind2word))
 
     def __len__(self):
         return len(self.indexed_data)
 
-    def create_mapping(self, path):
-        corpus_words = [self.pad_token] + ['<s>'] + ['</s>']
+    def create_mapping(self, path, min_sent_lenght, max_sent_lenght):
+        word2Ind = {self.pad_token: 0, '<s>': 1, '</s>': 2}
         num_corpus_words = 3
-        df = pd.read_csv(path)
-        lines = df.values
-        for line in lines:
-            tokenized_line = line[0].strip().split()
-            for word in tokenized_line:
-                if word not in corpus_words:
-                    corpus_words.append(word)
-                    num_corpus_words += 1
-        Ind2word = dict(enumerate(corpus_words))
-        word2Ind = {word: i for i, word in Ind2word.items()}
-        for line in lines:
-            tokenized_line = line[0].strip().split()
-            tokenized_line = ['<s>'] + tokenized_line + ['</s>']
-            indexed_tokenized_line = [word2Ind[word] for word in tokenized_line]
-            self.indexed_data.append(indexed_tokenized_line)
-
-        self.Ind2word = Ind2word
+        with open(path) as file:
+            for line in file:
+                tokenized_line = line.strip().split()
+                if len(tokenized_line) < min_sent_lenght or len(tokenized_line) > max_sent_lenght:
+                    continue
+                for word in tokenized_line:
+                    if word not in word2Ind:
+                        word2Ind[word] = num_corpus_words
+                        num_corpus_words += 1
+                tokenized_line = ['<s>'] + tokenized_line + ['</s>']
+                indexed_tokenized_line = [word2Ind[word] for word in tokenized_line]
+                self.indexed_data.append(indexed_tokenized_line)
+        self.Ind2word = dict(enumerate(word2Ind))
 
     def __getitem__(self, index):
         '''
